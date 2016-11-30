@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/cell_bg"
+    android:gravity="center"
+    android:padding="10dp"
+    android:id="@+id/custom_cell">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv1"/>
+
+    <TextView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/tv2"/>
+
+
+
+</LinearLayout>

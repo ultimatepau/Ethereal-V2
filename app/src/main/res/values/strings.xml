@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Ethereal V2</string>
+    <string name="btnAddSchedule">Tambah Tugas</string>
+    <string name="btnToday">Hari ini</string>
+    <string name="menu_about">Tentang</string>
+    <string name="setWeeksSchedule">Atur Jadwal Mingguan</string>
+    <string name="menu_settings">Pengaturan</string>
+</resources>
