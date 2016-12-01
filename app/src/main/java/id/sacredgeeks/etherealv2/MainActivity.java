@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,9 @@ public class MainActivity extends AppCompatActivity {
     private CaldroidFragment dialogCaldroidFragment;
     private String tanggal;
     private TextView datenow;
+    private ListView lsjadwal;
+    private ListView lstugas;
+
 
     private void setCustomResourceForDates() {
         Calendar cal = Calendar.getInstance();
