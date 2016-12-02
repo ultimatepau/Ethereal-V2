@@ -2,7 +2,6 @@ package id.sacredgeeks.etherealv2;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -28,30 +27,26 @@ import java.util.Locale;
 
 public class AddSchedule extends AppCompatActivity {
 
-    private TextView tvTanggal;
-    private String tanggal;
-    String imagePath;
-    File destination;
     private int TAKE_PHOTO_CODE = 0;
     public static int count = 0;
     private static final int REQUEST_IMAGE = 100;
+    private int angka;
+
+    private String tanggal;
+    String imagePath;
+    public static final String MY_PREFS_NAME = "Settings";
+
+
+    File destination;
 
     private EditText inputTugas;
     private EditText inputDeadline;
     private EditText inputketTugas;
+    private TextView tvTanggal;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences sharedPref = getSharedPreferences("count", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("count",""+count);
-        editor.commit();
-
-        SharedPreferences settings = getSharedPreferences("count", Context.MODE_PRIVATE);
-        String angka = settings.getString("count",null);
-
-        Toast.makeText(getApplicationContext(), "count = "+angka, Toast.LENGTH_SHORT).show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_schedule);
 
@@ -76,8 +71,15 @@ public class AddSchedule extends AppCompatActivity {
 
         }
 
-        SharedPreferences settings = getSharedPreferences("count", Context.MODE_PRIVATE);
-        String angka = settings.getString("count",null);
+        //Ambil Data
+        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        angka = prefs.getInt("count",0); //0 is the default value.
+
+        //Debug tambahin angka
+        SharedPreferences.Editor edit = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+        int temp = angka + 1;
+        edit.putInt("count", temp);
+        edit.commit();
 
         String name = "Foto"+angka+".jpg";
         destination = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/imgTugas/"+name);
@@ -96,15 +98,6 @@ public class AddSchedule extends AppCompatActivity {
                 //options.inSampleSize = 10;
                 imagePath = destination.getAbsolutePath();
 
-                SharedPreferences settings = getSharedPreferences("count", Context.MODE_PRIVATE);
-                String angka = settings.getString("count",null);
-                Integer lol = Integer.parseInt(angka);
-                lol++;
-
-                SharedPreferences sharedPref = getSharedPreferences("count", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("count",""+lol);
-                editor.apply();
                 //Bitmap bmp = BitmapFactory.decodeStream(in, null, options);
 
             } catch (FileNotFoundException e) {
@@ -113,6 +106,16 @@ public class AddSchedule extends AppCompatActivity {
 
         }
         else{
+            //Ambil Data
+            SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+            angka = prefs.getInt("count",0); //0 is the default value.
+
+            //Debug kurangin angka
+            SharedPreferences.Editor edit = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            int temp = angka - 1;
+            edit.putInt("count", temp);
+            edit.commit();
+
             Toast.makeText(getApplicationContext(),"Request Cancelled",Toast.LENGTH_SHORT).show();
         }
     }
@@ -152,7 +155,7 @@ public class AddSchedule extends AppCompatActivity {
     }
 
     public void submit(View view) {
-        message(AddSchedule.this,"Nama : "+inputTugas.getText());
+            message(AddSchedule.this,"Nama : "+inputTugas.getText());
 
         new CountDownTimer(1500, 1000) {
             public void onFinish() {
@@ -189,10 +192,9 @@ public class AddSchedule extends AppCompatActivity {
                 // millisUntilFinished    The amount of time until finished.
             }
         }.start();
-
     }
 
-    public  static void message(Activity activity,String message) {
+    public void message(Activity activity,String message) {
         View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
     }
