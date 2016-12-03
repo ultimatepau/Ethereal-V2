@@ -49,6 +49,7 @@
 
         <TextView
             android:paddingTop="10dp"
+            android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Jadwal Hari Ini :"
@@ -62,6 +63,7 @@
 
         <TextView
             android:paddingTop="10dp"
+            android:paddingLeft="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Tugas Hari Ini :"

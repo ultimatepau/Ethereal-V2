@@ -3,14 +3,14 @@ package id.sacredgeeks.etherealv2;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -29,62 +29,50 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private boolean undo = false;
     private CaldroidFragment caldroidFragment;
-    private CaldroidFragment dialogCaldroidFragment;
     private String tanggal;
     private TextView datenow;
     private ListView lsjadwal;
     private ListView lstugas;
     private int angka;
-
     JadwalAdapter adapter;
+    private ListView ls;
+
+    private Bundle state;
+
+    private SimpleDateFormat formatter;
 
     public static final String MY_PREFS_NAME = "Settings";
 
-
-    private void setCustomResourceForDates() {
-        Calendar cal = Calendar.getInstance();
-
-        // Min date is last 7 days
-        /* cal.add(Calendar.DATE, -7);
-        Date blueDate = cal.getTime(); */
-
-        // Max date is next 7 days
-        /* cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 7);
-        Date greenDate = cal.getTime(); */
-
-        if (caldroidFragment != null) {
-            ColorDrawable blue = new ColorDrawable(getResources().getColor(R.color.blue));
-            ColorDrawable green = new ColorDrawable(Color.GREEN);
-            // Jika ingin menambahkan warna
-            //caldroidFragment.setBackgroundDrawableForDate(blue, blueDate);
-            //caldroidFragment.setBackgroundDrawableForDate(green, greenDate);
-            //caldroidFragment.setTextColorForDate(R.color.white, blueDate);
-            //caldroidFragment.setTextColorForDate(R.color.white, greenDate);
-        }
-    }
-
-    @Override
+    @Override  //Memunculkan tombol menu
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.settings, menu);
         return true;
     }
 
-    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id  = item.getItemId();
+
+        if(id == R.id.action_settings) {
+            startActivity(new Intent(MainActivity.this,Preferences.class));
+        } else if(id == R.id.action_setweeks) {
+            AddSchedule AS = new AddSchedule();
+            AS.message(MainActivity.this, "Kamu Klik Atur Jadwal Mingguan");
+        } else if (id == R.id.about) {
+            about();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override //Mencegah ukuran tanggal berubah ketika rotasi
     protected void onSaveInstanceState(Bundle outState) {
         // TODO Auto-generated method stub
         super.onSaveInstanceState(outState);
 
         if (caldroidFragment != null) {
             caldroidFragment.saveStatesToKey(outState, "CALDROID_SAVED_STATE");
-        }
-
-        if (dialogCaldroidFragment != null) {
-            dialogCaldroidFragment.saveStatesToKey(outState,
-                    "DIALOG_CALDROID_SAVED_STATE");
         }
     }
 
@@ -154,47 +142,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ListView ls;
-
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        cekSP();
-
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy");
-        datenow = (TextView) findViewById(R.id.date_now);
-
+    public void move(View view) {
         caldroidFragment = new CaldroidFragment();
+        caldroidFragment.refreshView();
 
-        if (savedInstanceState != null) {
-            caldroidFragment.restoreStatesFromKey(savedInstanceState,
+        if (state != null) {
+            caldroidFragment.restoreStatesFromKey(state,
                     "CALDROID_SAVED_STATE");
         }  else {
             Bundle args = new Bundle();
             Calendar cal = Calendar.getInstance();
             args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
             args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
             args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
-
+            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
             caldroidFragment.setArguments(args);
         }
-
-        //setCustomResourceForDates();
 
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.kalender, caldroidFragment);
         t.commit();
 
-        String date = new SimpleDateFormat("dd MMM yyyy").format(new Date());
-        datenow.setText("Tanggal : "+date);
-        tanggal = date;
-
-        adapter = new JadwalAdapter(this,mockupdata());
+        final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy", Locale.US);
 
         final CaldroidListener listener = new CaldroidListener() {
             @Override
@@ -202,16 +171,6 @@ public class MainActivity extends AppCompatActivity {
                 datenow = (TextView) findViewById(R.id.date_now);
                 datenow.setText("Tanggal : "+formatter.format(date));
                 tanggal = formatter.format(date);
-
-                if (tanggal.equals("18 Dec 2016")) {
-                    SetData();
-                }
-                else {
-                    adapter.clear();
-                    adapter.notifyDataSetChanged();
-                    ls = (ListView) findViewById(R.id.lsjadwal);
-                    setListViewHeightBasedOnItems(ls);
-                }
             }
 
             @Override
@@ -234,21 +193,58 @@ public class MainActivity extends AppCompatActivity {
         caldroidFragment.setCaldroidListener(listener);
     }
 
-    public void move(View view) {
-        CaldroidFragment caldroidFragment = new CaldroidFragment();
-        caldroidFragment.refreshView();
-        Bundle args = new Bundle();
-        Calendar cal = Calendar.getInstance();
-        args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
-        args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-        args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR,false);
-        caldroidFragment.setArguments(args);
+    public void about() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogview = inflater.inflate(R.layout.layout_about,null);
+        builder.setView(dialogview);
+
+        builder.setTitle("About Ethereal V2");
+        builder.setCancelable(false)
+                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //do things
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        state = savedInstanceState;
+
+        cekSP();
+
+        formatter = new SimpleDateFormat("dd MMM yyyy");
+        datenow = (TextView) findViewById(R.id.date_now);
+
+        caldroidFragment = new CaldroidFragment();
+
+        if (savedInstanceState != null) {
+            caldroidFragment.restoreStatesFromKey(savedInstanceState,
+                    "CALDROID_SAVED_STATE");
+        }  else {
+            Bundle args = new Bundle();
+            Calendar cal = Calendar.getInstance();
+            args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
+            args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
+            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
+            args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
+
+            caldroidFragment.setArguments(args);
+        }
 
         FragmentTransaction t = getSupportFragmentManager().beginTransaction();
         t.replace(R.id.kalender, caldroidFragment);
         t.commit();
 
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+        String date = new SimpleDateFormat("dd MMM yyyy").format(new Date());
+        datenow.setText("Tanggal : "+date);
+        tanggal = date;
 
         final CaldroidListener listener = new CaldroidListener() {
             @Override

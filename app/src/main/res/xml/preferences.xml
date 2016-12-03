@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Pengingat">
+        <EditTextPreference
+            android:defaultValue="Hello"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Waktu pengingat deadline"/>
+
+        <EditTextPreference
+            android:defaultValue="Hello"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Suara pengingat"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
