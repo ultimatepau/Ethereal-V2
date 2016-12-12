@@ -1,4 +1,4 @@
-package id.sacredgeeks.etherealv2;
+package id.sacredgeeks.etherealv2.Activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,16 +27,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import id.sacredgeeks.etherealv2.Adapter.JadwalAdapter;
+import id.sacredgeeks.etherealv2.Model.Jadwal;
+import id.sacredgeeks.etherealv2.R;
+
 public class MainActivity extends AppCompatActivity {
 
     private CaldroidFragment caldroidFragment;
     private String tanggal;
     private TextView datenow;
+    JadwalAdapter adapter;
     private ListView lsjadwal;
     private ListView lstugas;
-    private int angka;
-    JadwalAdapter adapter;
-    private ListView ls;
 
     private Bundle state;
 
@@ -55,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
         int id  = item.getItemId();
 
         if(id == R.id.action_settings) {
-            startActivity(new Intent(MainActivity.this,Preferences.class));
+            AddSchedule AS = new AddSchedule();
+            AS.message(MainActivity.this, "Kamu Klik Pengaturan");
+            //startActivity(new Intent(MainActivity.this,Preferences.class));
         } else if(id == R.id.action_setweeks) {
             AddSchedule AS = new AddSchedule();
             AS.message(MainActivity.this, "Kamu Klik Atur Jadwal Mingguan");
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         //Cek apakah sudah ada SP?
         SharedPreferences get = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
 
-        if (get.contains("count")) {
+        if (get.contains("count") && get.contains("waktupengingat") && get.contains("suarapengingat")) {
             //Call snackbar dari java AddSchedule
             AddSchedule AS = new AddSchedule();
             AS.message(MainActivity.this,"SP Sudah ada");
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
             //Shared Preferences (Untuk Menyimpan Data selama app itu diinstal) add / edit
             SharedPreferences.Editor create = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
             create.putInt("count", 0);
+            create.putString("waktupengingat", "Belum Diatur");
+            create.putString("suarapengingat", "Belum Diatur");
             create.commit();
 
             AddSchedule AS = new AddSchedule();
@@ -101,13 +107,6 @@ public class MainActivity extends AppCompatActivity {
         item.add(new Jadwal("Ujian Bahasa Sunda","Jam 10","10.30","AdaFoto"));
         item.add(new Jadwal("Ujian Bahasa Indonesia","Jam 10","10.30","AdaFoto"));
         item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-        item.add(new Jadwal("Ujian Bahasa Jepang","Jam 10","10.30","AdaFoto"));
-
         return item;
     }
 
@@ -217,7 +216,12 @@ public class MainActivity extends AppCompatActivity {
 
         state = savedInstanceState;
 
+        SetData();
+
         cekSP();
+
+        AddSchedule AS = new AddSchedule();
+        AS.message(this,"Main Activity Loaded !");
 
         formatter = new SimpleDateFormat("dd MMM yyyy");
         datenow = (TextView) findViewById(R.id.date_now);
@@ -275,15 +279,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void SetData() {
-        adapter = new JadwalAdapter(this,mockupdata());
+        //adapter = new JadwalAdapter(this,mockupdata());
 
-        ls = (ListView) findViewById(R.id.lsjadwal);
+        lsjadwal = (ListView) findViewById(R.id.lsjadwal);
+        lstugas = (ListView) findViewById(R.id.lstugas);
 
-        ls.setAdapter(adapter);
+        lsjadwal.setAdapter(adapter);
+        lstugas.setAdapter(adapter);
 
-        setListViewHeightBasedOnItems(ls);
+        setListViewHeightBasedOnItems(lsjadwal);
+        setListViewHeightBasedOnItems(lstugas);
 
-        ls.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lsjadwal.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //AddSchedule as = new AddSchedule();

@@ -1,4 +1,4 @@
-package id.sacredgeeks.etherealv2;
+package id.sacredgeeks.etherealv2.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,16 +9,19 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import id.sacredgeeks.etherealv2.Model.Tugas;
+import id.sacredgeeks.etherealv2.R;
+
 /**
  * Created by SacredGeeks on 12/2/2016.
  */
 
-public class JadwalAdapter extends ArrayAdapter<Jadwal> {
+public class TugasAdapter extends ArrayAdapter<Tugas> {
 
     private final Context context;
-    private final ArrayList<Jadwal> itemsArrayList;
+    private final ArrayList<Tugas> itemsArrayList;
 
-    public JadwalAdapter(Context context, ArrayList<Jadwal> itemsArrayList) {
+    public TugasAdapter(Context context, ArrayList<Tugas> itemsArrayList) {
         super(context, R.layout.row_jadwal, itemsArrayList);
 
         this.context = context;
@@ -40,7 +43,7 @@ public class JadwalAdapter extends ArrayAdapter<Jadwal> {
         TextView deadlineJadwal = (TextView) rowView.findViewById(R.id.deadlineJadwal);
 
         // 4. Set the text for textView
-        namaJadwal.setText(itemsArrayList.get(position).getNamajadwal());
+        namaJadwal.setText(itemsArrayList.get(position).getNamatugas());
         deadlineJadwal.setText(itemsArrayList.get(position).getDeadline());
 
         // 5. retrn rowView

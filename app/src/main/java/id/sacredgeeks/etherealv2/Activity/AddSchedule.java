@@ -1,12 +1,12 @@
-package id.sacredgeeks.etherealv2;
+package id.sacredgeeks.etherealv2.Activity;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.File;
@@ -24,6 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import id.sacredgeeks.etherealv2.DB.DataSourceTugas;
+import id.sacredgeeks.etherealv2.Model.Tugas;
+import id.sacredgeeks.etherealv2.R;
 
 public class AddSchedule extends AppCompatActivity {
 
@@ -36,6 +41,8 @@ public class AddSchedule extends AppCompatActivity {
     String imagePath;
     public static final String MY_PREFS_NAME = "Settings";
 
+    private DataSourceTugas tugasData;
+    private Tugas tugasbaru;
 
     File destination;
 
@@ -43,6 +50,7 @@ public class AddSchedule extends AppCompatActivity {
     private EditText inputDeadline;
     private EditText inputketTugas;
     private TextView tvTanggal;
+    private EditText inputJam;
 
 
     @Override
@@ -53,6 +61,7 @@ public class AddSchedule extends AppCompatActivity {
         inputDeadline = (EditText) findViewById(R.id.inputdeadline);
         inputTugas = (EditText) findViewById(R.id.inputnamatugas);
         inputketTugas = (EditText) findViewById(R.id.inputkettugas);
+        inputJam = (EditText) findViewById(R.id.inputjamdeadline);
 
         tvTanggal = (TextView) findViewById(R.id.tvtanggal);
 
@@ -61,6 +70,10 @@ public class AddSchedule extends AppCompatActivity {
 
         tvTanggal.setText("Tanggal : "+tanggal);
 
+        tugasbaru = new Tugas();
+
+        tugasData = new DataSourceTugas(this);
+        tugasData.open();
     }
 
     public void browseImg(View view) {
@@ -155,47 +168,34 @@ public class AddSchedule extends AppCompatActivity {
     }
 
     public void submit(View view) {
-            message(AddSchedule.this,"Nama : "+inputTugas.getText());
+        tugasbaru.setNamatugas(inputTugas.getText().toString());
+        tugasbaru.setKeterangan(inputketTugas.getText().toString());
+        tugasbaru.setDeadline(inputketTugas.getText().toString());
+        tugasbaru.setPathImg(imagePath);
+        tugasbaru.setAlarm(inputJam.getText().toString());
+        tugasData.createTugas(tugasbaru);
 
-        new CountDownTimer(1500, 1000) {
-            public void onFinish() {
-                // When timer is finished
-                // Execute your code here
-                message(AddSchedule.this,"Keterangan : "+inputketTugas.getText());
-            }
+        Toast.makeText(this, "Tugas "+tugasbaru.getNamatugas()+"telah dibuat !", Toast.LENGTH_SHORT).show();
 
-            public void onTick(long millisUntilFinished) {
-                // millisUntilFinished    The amount of time until finished.
-            }
-        }.start();
-
-        new CountDownTimer(2500, 1000) {
-            public void onFinish() {
-                // When timer is finished
-                // Execute your code here
-                message(AddSchedule.this,"Deadline : "+inputDeadline.getText());
-            }
-
-            public void onTick(long millisUntilFinished) {
-                // millisUntilFinished    The amount of time until finished.
-            }
-        }.start();
-
-        new CountDownTimer(4500, 1000) {
-            public void onFinish() {
-                // When timer is finished
-                // Execute your code here
-                message(AddSchedule.this,"ImagePath : "+imagePath);
-            }
-
-            public void onTick(long millisUntilFinished) {
-                // millisUntilFinished    The amount of time until finished.
-            }
-        }.start();
     }
 
     public void message(Activity activity,String message) {
         View rootView = activity.getWindow().getDecorView().findViewById(android.R.id.content);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    public void inputTime(View view) {
+        Calendar mcurrentTime = Calendar.getInstance();
+        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = mcurrentTime.get(Calendar.MINUTE);
+        TimePickerDialog mTimePicker;
+        mTimePicker = new TimePickerDialog(AddSchedule.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                inputJam.setText( selectedHour + ":" + selectedMinute);
+            }
+        }, hour, minute, true);//Yes 24 hour time
+        mTimePicker.setTitle("Pilih Jam");
+        mTimePicker.show();
     }
 }

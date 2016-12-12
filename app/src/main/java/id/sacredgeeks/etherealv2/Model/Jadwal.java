@@ -1,4 +1,4 @@
-package id.sacredgeeks.etherealv2;
+package id.sacredgeeks.etherealv2.Model;
 
 /**
  * Created by SacredGeeks on 12/2/2016.
@@ -7,17 +7,17 @@ package id.sacredgeeks.etherealv2;
 public class Jadwal {
     private String Namajadwal;
     private String Keterangan;
-    private String Deadline;
+    private String Alarm;
     private String PathImg;
 
     public Jadwal() {
 
     }
 
-    public Jadwal(String namajadwal, String keterangan, String deadline, String pathImg) {
+    public Jadwal(String namajadwal, String keterangan, String alarm, String pathImg) {
         Namajadwal = namajadwal;
         Keterangan = keterangan;
-        Deadline = deadline;
+        Alarm = alarm;
         PathImg = pathImg;
     }
 
@@ -37,12 +37,12 @@ public class Jadwal {
         Keterangan = keterangan;
     }
 
-    public String getDeadline() {
-        return Deadline;
+    public String getAlarm() {
+        return Alarm;
     }
 
-    public void setDeadline(String deadline) {
-        Deadline = deadline;
+    public void setAlarm(String alarm) {
+        Alarm = alarm;
     }
 
     public String getPathImg() {
@@ -52,4 +52,5 @@ public class Jadwal {
     public void setPathImg(String pathImg) {
         PathImg = pathImg;
     }
+
 }

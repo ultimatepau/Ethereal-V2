@@ -4,13 +4,19 @@
 
     <PreferenceCategory android:title="Pengingat">
         <EditTextPreference
-            android:defaultValue="Hello"
+            android:defaultValue="07.00"
+            android:summary="%s"
             android:selectAllOnFocus="true"
             android:singleLine="true"
+            android:id="@+id/waktupengingat"
+            android:key="waktupengingat"
             android:title="Waktu pengingat deadline"/>
 
         <EditTextPreference
-            android:defaultValue="Hello"
+            android:summary="%s"
+            android:id="@+id/suarapengingat"
+            android:key="suarapengingat"
+            android:defaultValue="Zedd - Ignite"
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="Suara pengingat"/>

@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,18 +19,18 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AddSchedule"
+        <activity android:name=".Activity.AddSchedule"
             android:label="Tambah Tugas">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".Activity.MainActivity" />
         </activity>
 
-        <activity android:name=".Preferences"
+        <activity android:name=".Activity.Preferences"
             android:label="Pengaturan">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".Activity.MainActivity" />
         </activity>
     </application>
 
