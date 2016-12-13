@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,10 +26,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
-import id.sacredgeeks.etherealv2.Adapter.JadwalAdapter;
+import id.sacredgeeks.etherealv2.Adapter.TugasAdapter;
+import id.sacredgeeks.etherealv2.DB.DataSourceTugas;
 import id.sacredgeeks.etherealv2.Model.Jadwal;
+import id.sacredgeeks.etherealv2.Model.Tugas;
 import id.sacredgeeks.etherealv2.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private CaldroidFragment caldroidFragment;
     private String tanggal;
     private TextView datenow;
-    JadwalAdapter adapter;
+    TugasAdapter Tadapter;
     private ListView lsjadwal;
     private ListView lstugas;
+    private Button movetoday;
 
     private Bundle state;
 
@@ -142,54 +145,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void move(View view) {
-        caldroidFragment = new CaldroidFragment();
-        caldroidFragment.refreshView();
 
-        if (state != null) {
-            caldroidFragment.restoreStatesFromKey(state,
-                    "CALDROID_SAVED_STATE");
-        }  else {
-            Bundle args = new Bundle();
-            Calendar cal = Calendar.getInstance();
-            args.putInt(CaldroidFragment.MONTH, cal.get(Calendar.MONTH) + 1);
-            args.putInt(CaldroidFragment.YEAR, cal.get(Calendar.YEAR));
-            args.putBoolean(CaldroidFragment.SIX_WEEKS_IN_CALENDAR, false);
-            args.putBoolean(CaldroidFragment.ENABLE_SWIPE, true);
-            caldroidFragment.setArguments(args);
-        }
-
-        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-        t.replace(R.id.kalender, caldroidFragment);
-        t.commit();
-
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy", Locale.US);
-
-        final CaldroidListener listener = new CaldroidListener() {
-            @Override
-            public void onSelectDate(Date date, View view) {
-                datenow = (TextView) findViewById(R.id.date_now);
-                datenow.setText("Tanggal : "+formatter.format(date));
-                tanggal = formatter.format(date);
-            }
-
-            @Override
-            public void onChangeMonth(int month, int year) {
-
-            }
-
-            @Override
-            public void onLongClickDate(Date date, View view) {
-
-            }
-
-            @Override
-            public void onCaldroidViewCreated() {
-
-            }
-
-        };
-
-        caldroidFragment.setCaldroidListener(listener);
     }
 
     public void about() {
@@ -216,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
         state = savedInstanceState;
 
+        tanggal = new SimpleDateFormat("dd MMM yyyy").format(new Date());
         SetData();
 
         cekSP();
@@ -223,8 +180,11 @@ public class MainActivity extends AppCompatActivity {
         AddSchedule AS = new AddSchedule();
         AS.message(this,"Main Activity Loaded !");
 
+        movetoday = (Button) findViewById(R.id.movetoday);
         formatter = new SimpleDateFormat("dd MMM yyyy");
         datenow = (TextView) findViewById(R.id.date_now);
+
+        movetoday.setEnabled(false);
 
         caldroidFragment = new CaldroidFragment();
 
@@ -256,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                 datenow = (TextView) findViewById(R.id.date_now);
                 datenow.setText("Tanggal : "+formatter.format(date));
                 tanggal = formatter.format(date);
+                SetData();
             }
 
             @Override
@@ -278,41 +239,61 @@ public class MainActivity extends AppCompatActivity {
         caldroidFragment.setCaldroidListener(listener);
     }
 
+    private DataSourceTugas tugasData;
+    ArrayList <Tugas> tugas;
+
     public void SetData() {
         //adapter = new JadwalAdapter(this,mockupdata());
+        tugasData = new DataSourceTugas(this);
+        tugasData.open();
+        tugas = tugasData.getTugas(tanggal);
+        tugasData.close();
 
-        lsjadwal = (ListView) findViewById(R.id.lsjadwal);
+        Tadapter = new TugasAdapter(this,tugas);
+        //lsjadwal = (ListView) findViewById(R.id.lsjadwal);
         lstugas = (ListView) findViewById(R.id.lstugas);
 
-        lsjadwal.setAdapter(adapter);
-        lstugas.setAdapter(adapter);
+        //lsjadwal.setAdapter(adapter);
+        lstugas.setAdapter(Tadapter);
 
-        setListViewHeightBasedOnItems(lsjadwal);
+        //setListViewHeightBasedOnItems(lsjadwal);
         setListViewHeightBasedOnItems(lstugas);
 
-        lsjadwal.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lstugas.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 //AddSchedule as = new AddSchedule();
                 //as.message(MainActivity.this,"Mantab Jiwa");
 
-                Jadwal jj = new Jadwal();
-                jj = mockupdata().get(i);
+                Tugas t = new Tugas();
+                t = tugas.get(i);
 
                 final CharSequence[] items = {"Perbaharui", "Hapus", "Lihat Rinci"};
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Aksi "+jj.getNamajadwal());
+                builder.setTitle("Aksi "+t.getDate_Created());
+
                 builder.setItems(items, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
                         // Do something with the selection
+                        Tugas tt = new Tugas();
+                        tt = tugas.get(i);
+
                         AddSchedule AS = new AddSchedule();
                         if(item == 0) {
                             AS.message(MainActivity.this, "Kamu klik perbaharui" );
                         } else if (item == 1) {
-                            AS.message(MainActivity.this, "Kamu klik Hapus" );
+                            AS.message(MainActivity.this, "ID : "+tt.getID_Tugas() );
                         } else if (item == 2) {
-                            AS.message(MainActivity.this, "Kamu klik Lihat Rinci" );
+                            Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                            i.putExtra("tgldibuat",tt.getDate_Created());
+                            i.putExtra("namatugas",tt.getNamatugas());
+                            i.putExtra("kettugas",tt.getKeterangan());
+                            i.putExtra("deadlinetugas",tt.getDeadline());
+                            i.putExtra("jamtugas",tt.getAlarm());
+                            i.putExtra("pathimg",tt.getPathImg());
+                            startActivity(i);
+
                         }
                     }
                 });

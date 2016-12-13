@@ -167,10 +167,19 @@ public class AddSchedule extends AppCompatActivity {
         inputDeadline.setText(sdf.format(myCalendar.getTime()));
     }
 
+    @Override
+    public void onBackPressed() {
+        // your code.
+    }
+
     public void submit(View view) {
+        Intent i = getIntent();
+        tanggal = i.getStringExtra("tanggal");
+
+        tugasbaru.setDate_Created(tanggal);
         tugasbaru.setNamatugas(inputTugas.getText().toString());
         tugasbaru.setKeterangan(inputketTugas.getText().toString());
-        tugasbaru.setDeadline(inputketTugas.getText().toString());
+        tugasbaru.setDeadline(inputDeadline.getText().toString());
         tugasbaru.setPathImg(imagePath);
         tugasbaru.setAlarm(inputJam.getText().toString());
         tugasData.createTugas(tugasbaru);

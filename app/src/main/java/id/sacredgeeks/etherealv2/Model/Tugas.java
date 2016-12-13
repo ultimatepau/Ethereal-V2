@@ -6,13 +6,14 @@ package id.sacredgeeks.etherealv2.Model;
 
 public class Tugas {
 
-    public Tugas(String namatugas, String keterangan, String deadline, String alarm, String pathImg,String id_tugas) {
+    public Tugas(String namatugas, String keterangan, String deadline, String alarm, String pathImg, int ID_Tugas, String date_Created) {
         Namatugas = namatugas;
         Keterangan = keterangan;
         Deadline = deadline;
         Alarm = alarm;
         PathImg = pathImg;
-        ID_Tugas = id_tugas;
+        this.ID_Tugas = ID_Tugas;
+        Date_Created = date_Created;
     }
 
     private String Namatugas;
@@ -20,16 +21,8 @@ public class Tugas {
     private String Deadline;
     private String Alarm;
     private String PathImg;
-
-    public String getID_Tugas() {
-        return ID_Tugas;
-    }
-
-    public void setID_Tugas(String ID_Tugas) {
-        this.ID_Tugas = ID_Tugas;
-    }
-
-    private String ID_Tugas;
+    private int ID_Tugas;
+    private String Date_Created;
 
     public String getNamatugas() {
         return Namatugas;
@@ -69,6 +62,22 @@ public class Tugas {
 
     public void setPathImg(String pathImg) {
         PathImg = pathImg;
+    }
+
+    public int getID_Tugas() {
+        return ID_Tugas;
+    }
+
+    public void setID_Tugas(int ID_Tugas) {
+        this.ID_Tugas = ID_Tugas;
+    }
+
+    public String getDate_Created() {
+        return Date_Created;
+    }
+
+    public void setDate_Created(String date_Created) {
+        Date_Created = date_Created;
     }
 
     public Tugas() {
